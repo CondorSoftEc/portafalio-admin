@@ -1,0 +1,11 @@
+{
+  "targets": {
+    "condorsoft-portafolio": {
+      "hosting": {
+        "PortafolioAdmin": [
+          "condorsoft-portafolio"
+        ]
+      }
+    }
+  }
+}

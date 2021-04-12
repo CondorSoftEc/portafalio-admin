@@ -1,0 +1,25 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h2>Menu</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="d-grid gap-2">
+        <a [routerLink]="['restaurants']" class="btn btn-info btn-lg btn-block"
+           role="button" aria-pressed="true">Restaurantes</a>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="d-grid gap-2">
+        <button (click)="signOut()" class="btn btn-danger btn-lg btn-block">
+          Salir
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
