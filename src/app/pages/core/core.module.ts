@@ -7,6 +7,7 @@ import {AlertModule} from '../../_alert';
 import {HomeComponent} from '../home/home.component';
 
 import {FormsModule} from '@angular/forms';
+import {FilterPipe} from '../../pipes/filter.pipe';
 
 
 
@@ -14,6 +15,7 @@ import {FormsModule} from '@angular/forms';
     declarations: [
         CoreComponent,
         HomeComponent,
+        FilterPipe,
     ],
   imports: [
     CommonModule,

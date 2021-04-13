@@ -2,9 +2,9 @@
   "targets": {
     "condorsoft-portafolio": {
       "hosting": {
-        "PortafolioAdmin": [
-          "condorsoft-portafolio"
-        ]
+       "admin": [
+          "admin-condorsoft-portafolio"
+        ],
       }
     }
   }

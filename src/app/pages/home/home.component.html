@@ -1,24 +1,60 @@
 <div class="container">
   <div class="row">
-    <div class="col-md-12">
-      <h2>Menu</h2>
+    <div class="col-md-10">
+      <h2>Proyectos</h2>
     </div>
-  </div>
-  <div class="row">
-    <div class="col-md-12">
-      <div class="d-grid gap-2">
-        <a [routerLink]="['restaurants']" class="btn btn-info btn-lg btn-block"
-           role="button" aria-pressed="true">Restaurantes</a>
-      </div>
+    <div class="col-md-2">
+      <button type="button" class="btn btn-success" (click)="newProject()">Nuevo</button>
     </div>
   </div>
   <br>
   <div class="row">
-    <div class="col-md-12">
-      <div class="d-grid gap-2">
-        <button (click)="signOut()" class="btn btn-danger btn-lg btn-block">
-          Salir
-        </button>
+    <div class="col">
+      <input class="form-control  w-100" type="search" placeholder="Buscar proyecto" aria-label="Search"
+             [(ngModel)]="searchText">
+    </div>
+  </div>
+  <br>
+  <div class="row">
+    <div class="col-md-6" *ngFor="let project of projects |filter: searchText">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">{{project.name}}</h5>
+          <hr>
+          <span class="badge rounded-pill bg-primary" *ngFor="let tech of  project.tech">
+            {{tech.name}}
+          </span>
+          <p class="card-text">
+            {{project.description}}
+          </p>
+          <h6>
+            Logros
+          </h6>
+          <div class="accordion accordion-flush" id="accordionFlushExample"
+               *ngFor="let achievement of project.achievements; index as i">
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="flush-headingOne">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                        [attr.aria-controls]="'achievementCollapse'+project.id+i"
+                        [attr.data-bs-target]="'#achievementCollapse'+project.id+i" aria-expanded="false">
+                  {{achievement.name}}
+                </button>
+              </h2>
+              <div [id]="'achievementCollapse'+project.id+i" class="accordion-collapse collapse"
+                   aria-labelledby="flush-headingOne"
+                   data-bs-parent="#accordionFlushExample">
+                <div class="accordion-body">
+                  {{achievement.description}}
+                </div>
+              </div>
+            </div>
+          </div>
+          <br>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+            <a href="{{project.url}}" target="_blank" class="btn btn-warning">Conocer</a>
+            <button type="button" class="btn btn-primary" (click)="editProject(project.id)">Editar</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>

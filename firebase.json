@@ -1,7 +1,7 @@
 {
   "hosting": [
     {
-      "target": "PortafolioAdmin",
+      "target": "admin",
       "public": "dist/PortafolioAdmin",
       "ignore": [
         "**/.*"

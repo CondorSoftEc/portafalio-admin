@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
+import {environment} from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +7,11 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'PortafolioAdmin';
+  constructor() {
+    if (environment.production) {
+      console.log('Es bueno verte aqui :D');
+      console.log = () => {
+      };
+    }
+  }
 }

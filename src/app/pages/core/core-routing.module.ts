@@ -4,7 +4,6 @@ import {CoreComponent} from './core.component';
 import {HomeComponent} from '../home/home.component';
 
 
-
 const routes: Routes = [
   {
     path: 'main',
@@ -13,10 +12,13 @@ const routes: Routes = [
       {
         path: '',
         component: HomeComponent,
+      },
+      {
+        path: 'editar/proyecto', loadChildren: () => import('../project-edit/project-edit.module').then(m => m.ProjectEditModule)
       }
     ]
   },
-  {path: '', redirectTo: '/main', pathMatch: 'full'}
+  {path: '', redirectTo: '/main', pathMatch: 'full'},
 ];
 
 @NgModule({
