@@ -1,11 +1,14 @@
 {
+  "projects": {
+    "default": "condorsoft-portafolio"
+  },
   "targets": {
-    "condorsoft-portafolio": {
-      "hosting": {
-        "admin": [
-          "admin-condorsoft-portafolio"
-        ],
+      "condorsoft-portafolio": {
+        "hosting": {
+          "admin": [
+            "admin-condorsoft-portafolio"
+          ],
+        }
       }
     }
-  }
 }
