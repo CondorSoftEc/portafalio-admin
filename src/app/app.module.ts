@@ -10,6 +10,7 @@ import {AngularFireAuthModule} from '@angular/fire/auth';
 import {AngularFirestoreModule} from '@angular/fire/firestore';
 import {AngularFireModule} from '@angular/fire';
 import {PerformanceMonitoringService} from '@angular/fire/performance';
+import {AngularFireStorageModule} from '@angular/fire/storage';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import {PerformanceMonitoringService} from '@angular/fire/performance';
     AngularFireModule.initializeApp(environment.firebaseConfig),
     AngularFirestoreModule,
     AngularFireAuthModule,
+    AngularFireStorageModule,
     AngularFireAnalyticsModule,
     ServiceWorkerModule.register('ngsw-worker.js', {enabled: environment.production})
   ],

@@ -3,6 +3,7 @@ import {Project} from '../../models/project';
 import {ProjectsService} from '../../services/projects.service';
 import {Subscription} from 'rxjs';
 import {Router} from '@angular/router';
+import {Categories} from '../../enums/categories.enum';
 
 
 @Component({
@@ -17,6 +18,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   searchText = '';
 
+  categories = Categories;
 
   constructor(private projectsService: ProjectsService,
               private router: Router) {

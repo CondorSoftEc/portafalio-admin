@@ -1,11 +1,15 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
 import {ProjectsService} from '../../services/projects.service';
 import {Project} from '../../models/project';
 import {Subscription} from 'rxjs';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AlertService} from '../../_alert';
 import {AuthenticationService} from '../../services/authentication.service';
+import {Categories} from '../../enums/categories.enum';
+import {finalize} from 'rxjs/operators';
+import {ImagesService} from '../../services/images.service';
+import {Icons} from '../../enums/icons.enum';
 
 @Component({
   selector: 'app-project-edit',
@@ -19,14 +23,16 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
     url: '',
     description: '',
     achievements: [],
+    references: [],
     tech: [],
+    type: null,
+    image: null,
   } as Project;
 
   sub: Subscription;
 
   projectForm;
 
-  edit = false;
 
   options = {
     autoClose: true,
@@ -35,17 +41,33 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
 
   auxTech;
   auxAchievement;
+  auxReference;
 
+  // TODO change this in deploy
   logged = false;
+
+  categories = Categories;
+  icons = Icons;
+
+
+  @ViewChild('imgInput')
+  imgInput: ElementRef;
+  fileForm = new FormData();
+  maxSize = 25;
+  uploadProgress = 0;
+  upload = false;
 
   constructor(private route: ActivatedRoute,
               private projectsService: ProjectsService,
               protected alertService: AlertService,
-              private authService: AuthenticationService) {
+              private authService: AuthenticationService,
+              private imagesService: ImagesService,
+              private router: Router) {
     this.projectForm = new FormGroup({
       name: new FormControl(this.project.name, Validators.required),
       description: new FormControl(this.project.description),
       url: new FormControl(this.project.url),
+      category: new FormControl(this.project.type),
     });
   }
 
@@ -61,16 +83,12 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
     return this.projectForm.get('url');
   }
 
-  enableEdit(): void {
-    this.edit = !this.edit;
-    if (this.edit) {
-      this.name.setValue(this.project.name);
-      this.description.setValue(this.project.description);
-      this.url.setValue(this.project.url);
-    }
+  get category(): any {
+    return this.projectForm.get('category');
   }
 
-  removeBadge(index): void {
+
+  removeTech(index): void {
     this.project.tech.splice(index, 1);
   }
 
@@ -78,18 +96,29 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
     this.project.achievements.splice(index, 1);
   }
 
+  removeReference(index): void {
+    this.project.references.splice(index, 1);
+  }
+
   saveProject(data): void {
     this.project.name = data.name;
     this.project.url = data.url;
     this.project.description = data.description;
+    this.project.type = data.category;
     this.updateData();
-    this.enableEdit();
   }
 
   setAuxTech(): void {
     this.auxTech = {
       name: null,
-      link: null,
+      url: null,
+    };
+  }
+
+  setReference(): void {
+    this.auxReference = {
+      icon: null,
+      url: null,
     };
   }
 
@@ -100,6 +129,11 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
 
   addAchievement(): void {
     this.project.achievements.push(this.auxAchievement);
+  }
+
+  addReference(): void {
+    console.log(this.auxReference);
+    this.project.references.push(this.auxReference);
   }
 
   setAchievement(): void {
@@ -115,10 +149,12 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
       if ('id' in this.project) {
         this.projectsService.updateProject(this.project).then(() => {
           this.alertService.success('Proyecto actualizado', this.options);
+          // this.router.navigate(['/main']);
         });
       } else {
         this.projectsService.postProject(this.project).then(() => {
           this.alertService.success('Proyecto actualizado', this.options);
+          // this.router.navigate(['/main']);
         });
       }
     } else {
@@ -126,17 +162,67 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
     }
   }
 
+  setImageCategory(category): void {
+    this.imagesService.category = category;
+  }
+
+  fileChange(event): void {
+    if (event.target.files.length > 0) {
+      const size = (event.target.files[0].size / 1024) / 1024;
+      if (size < this.maxSize) {
+        this.fileForm.append('archivo', event.target.files[0], event.target.files[0].name);
+        this.uploadFile();
+      } else {
+        window.alert(`La imagen supera el tamaño maximo permitido de ${this.maxSize} Mb`);
+      }
+    }
+  }
+
+  resetImgInput(): void {
+    this.imgInput.nativeElement.value = '';
+  }
+
+  uploadFile(): void {
+    const file = this.fileForm.get('archivo');
+    if (file) {
+      this.upload = true;
+      this.imagesService.uploadImage(file)
+        .percentageChanges().pipe(
+        finalize(() => {
+          this.imagesService.postImage();
+          this.imagesService.getMainImage(this.imagesService.newImage.name).then((url) => {
+            this.project.image = url;
+            this.imagesService.getIcon(this.imagesService.newImage.name).then((iconUrl) => {
+              this.project.icon = iconUrl;
+              this.upload = false;
+              this.resetImgInput();
+            });
+          });
+        })
+      ).subscribe(percent => {
+        // console.log(percent);
+        if (percent !== 0) {
+          this.uploadProgress = (percent / 100);
+        }
+      });
+    } else {
+      console.log('Selecciona un archivo valido');
+    }
+  }
+
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
-      // console.log(params.get('projectId'));
       if (params.get('projectId')) {
         this.sub = this.projectsService.getProject(params.get('projectId')).subscribe(data => {
           if (data) {
-            this.project = data;
+            this.project = {...this.project, ...data};
+            console.log('Project ', data);
+            this.name.setValue(this.project.name);
+            this.description.setValue(this.project.description);
+            this.url.setValue(this.project.url);
+            this.category.setValue(this.project.type);
           }
         });
-      } else {
-        this.edit = true;
       }
     });
 
