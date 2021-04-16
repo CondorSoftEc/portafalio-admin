@@ -27,7 +27,7 @@
             </textarea>
             </div>
             <div class="form-group">
-              <label for="name">URL: </label>
+              <label for="url">URL: </label>
               <input type="text" class="form-control" id="url" formControlName="url">
             </div>
             <div class="form-group">
@@ -136,6 +136,39 @@
                         data-bs-toggle="modal" data-bs-target="#referenceModal">Nueva
                 </button>
               </div>
+            </div>
+            <div class="form-group">
+              <div class="row">
+                <div class="col">
+                  <h6>Capturas:</h6>
+                </div>
+              </div>
+              <div class="row align-items-center" *ngIf=" project.captures.length >0 else noCaptures">
+                <div class="col-md-4 col-xs-12  align-self-center"
+                     *ngFor="let capture of project.captures; index as i">
+                  <img *ngIf="capture.image" src="{{capture.image}}" alt="{{capture.alt}}" class="img-fluid shadow">
+                  <div class="d-flex justify-content-center">
+                    <i>{{capture.title}}</i>
+                  </div>
+                  <div class="d-flex justify-content-center">
+                  <span *ngIf="logged" class="badge bg-danger  rounded-pill" (click)="removeCapture(i)">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                           class="bi bi-trash-fill" viewBox="0 0 16 16">
+  <path
+    d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
+</svg>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <ng-template #noCaptures>
+                <p class="text-center">No hay capturas configuradas</p>
+              </ng-template>
+            </div>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end  pt-1" *ngIf="logged">
+              <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#imageModal"
+                      (click)="setImageCategory('captures')">Nueva
+              </button>
             </div>
             <br>
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -251,8 +284,28 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
+        <ng-container *ngIf="imageCategory === 'captures' && auxCapture">
+          <div class="form-group">
+            <label for="captureTitle">Titulo: </label>
+            <input [(ngModel)]="auxCapture.title" type="text" class="form-control" id="captureTitle">
+          </div>
+          <div class="form-group">
+            <label for="captureAlt">Alt: </label>
+            <input [(ngModel)]="auxCapture.alt" type="text" class="form-control" id="captureAlt">
+          </div>
+          <br>
+          <ng-container *ngIf="auxCapture.image">
+            <div class="d-flex justify-content-center">
+              <h6>Previsualización</h6>
+            </div>
+            <div class="d-flex justify-content-center">
+              <img *ngIf="auxCapture.image" src="{{auxCapture.image}}" alt="{{auxCapture.alt}}"
+                   class="mainImage shadow">
+            </div>
+          </ng-container>
+        </ng-container>
         <div class="form-group">
-          <label for="formFile" class="form-label">Nueva Imagen</label>
+          <label for="formFile" class="form-label">Nueva Imagen:</label>
           <input #imgInput [disabled]="upload" accept="image/*" class="form-control" type="file" id="formFile"
                  (change)="fileChange($event)">
         </div>
@@ -265,8 +318,13 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+        <button *ngIf="imageCategory !== 'captures'" type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                [disabled]="upload"
                 (click)="updateData()">Agregar
+        </button>
+        <button *ngIf="imageCategory === 'captures'" type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                [disabled]="upload || (imageCategory === 'captures' && !auxCapture.title)"
+                (click)="addCapture()">Agregar
         </button>
       </div>
     </div>

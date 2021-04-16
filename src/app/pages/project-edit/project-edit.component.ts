@@ -25,6 +25,7 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
     achievements: [],
     references: [],
     tech: [],
+    captures: [],
     type: null,
     image: null,
   } as Project;
@@ -42,8 +43,8 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
   auxTech;
   auxAchievement;
   auxReference;
+  auxCapture;
 
-  // TODO change this in deploy
   logged = false;
 
   categories = Categories;
@@ -56,6 +57,8 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
   maxSize = 25;
   uploadProgress = 0;
   upload = false;
+
+  imageCategory: string;
 
   constructor(private route: ActivatedRoute,
               private projectsService: ProjectsService,
@@ -100,6 +103,10 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
     this.project.references.splice(index, 1);
   }
 
+  removeCapture(index): void {
+    this.project.captures.splice(index, 1);
+  }
+
   saveProject(data): void {
     this.project.name = data.name;
     this.project.url = data.url;
@@ -132,7 +139,6 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
   }
 
   addReference(): void {
-    console.log(this.auxReference);
     this.project.references.push(this.auxReference);
   }
 
@@ -163,7 +169,16 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
   }
 
   setImageCategory(category): void {
+    this.imageCategory = category;
     this.imagesService.category = category;
+    if (this.imageCategory === 'captures') {
+      this.auxCapture = {
+        image: null,
+        thumbImage: null,
+        alt: null,
+        title: null,
+      };
+    }
   }
 
   fileChange(event): void {
@@ -182,6 +197,11 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
     this.imgInput.nativeElement.value = '';
   }
 
+  addCapture(): void {
+    this.project.captures.push(this.auxCapture);
+    this.updateData();
+  }
+
   uploadFile(): void {
     const file = this.fileForm.get('archivo');
     if (file) {
@@ -191,12 +211,22 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
         finalize(() => {
           this.imagesService.postImage();
           this.imagesService.getMainImage(this.imagesService.newImage.name).then((url) => {
-            this.project.image = url;
-            this.imagesService.getIcon(this.imagesService.newImage.name).then((iconUrl) => {
-              this.project.icon = iconUrl;
-              this.upload = false;
-              this.resetImgInput();
-            });
+            if (this.imageCategory === 'general') {
+              this.project.image = url;
+              this.imagesService.getIcon(this.imagesService.newImage.name).then((iconUrl) => {
+                this.project.icon = iconUrl;
+                this.upload = false;
+                this.resetImgInput();
+              });
+            }
+            if (this.imageCategory === 'captures') {
+              this.auxCapture.image = url;
+              this.imagesService.getIcon(this.imagesService.newImage.name).then((thumbUrl) => {
+                this.auxCapture.thumbImage = thumbUrl;
+                this.upload = false;
+                this.resetImgInput();
+              });
+            }
           });
         })
       ).subscribe(percent => {

@@ -19,24 +19,18 @@ export class ImagesService {
     this.images = this.afStore.collection('images');
   }
 
-  // imageReference: any;
   category = 'general';
   newImage: any;
 
   uploadImage(image: any): any {
     const randomId = Math.random().toString(36).substring(2);
     const shortName = `${new Date().getTime()}_${randomId}`;
-    // console.log(shortName);
     this.newImage = {
-      // url: '',
       name: shortName,
       date: this.timestamp,
       category: this.category,
       ref: `${this.category}/${shortName}`
-      // ref: this.storage.ref(this.newImage.name)
     };
-
-    // this.imageReference = ;
     return this.storage.upload(this.newImage.ref, image);
   }
 
