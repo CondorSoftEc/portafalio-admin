@@ -45,7 +45,7 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
   auxReference;
   auxCapture;
 
-  logged = false;
+  logged = true;
 
   categories = Categories;
   icons = Icons;
@@ -210,24 +210,30 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
         .percentageChanges().pipe(
         finalize(() => {
           this.imagesService.postImage();
-          this.imagesService.getMainImage(this.imagesService.newImage.name).then((url) => {
-            if (this.imageCategory === 'general') {
+          if (this.imageCategory === 'icon') {
+            this.imagesService.getIcon(this.imagesService.newImage.name).then((iconUrl) => {
+              this.project.icon = iconUrl;
+              this.upload = false;
+              this.resetImgInput();
+            });
+          }
+          if (this.imageCategory === 'general') {
+            this.imagesService.getMainImage(this.imagesService.newImage.name).then((url) => {
               this.project.image = url;
-              this.imagesService.getIcon(this.imagesService.newImage.name).then((iconUrl) => {
-                this.project.icon = iconUrl;
-                this.upload = false;
-                this.resetImgInput();
-              });
-            }
-            if (this.imageCategory === 'captures') {
+              this.upload = false;
+              this.resetImgInput();
+            });
+          }
+          if (this.imageCategory === 'captures') {
+            this.imagesService.getMainImage(this.imagesService.newImage.name).then((url) => {
               this.auxCapture.image = url;
               this.imagesService.getIcon(this.imagesService.newImage.name).then((thumbUrl) => {
                 this.auxCapture.thumbImage = thumbUrl;
                 this.upload = false;
                 this.resetImgInput();
               });
-            }
-          });
+            });
+          }
         })
       ).subscribe(percent => {
         // console.log(percent);

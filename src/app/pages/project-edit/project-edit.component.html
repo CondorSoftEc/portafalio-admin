@@ -64,7 +64,7 @@
             </div>
             <div class="form-group">
               <h6>Logros:</h6>
-              <ol class="list-group ">
+              <ol class="list-group " *ngIf="project.achievements.length > 0 else noAchievements">
                 <li class="list-group-item d-flex justify-content-between align-items-start"
                     *ngFor="let achievement of project.achievements; index as i">
                   <div class="ms-2 me-auto">
@@ -79,6 +79,9 @@
                     </span>
                 </li>
               </ol>
+              <ng-template #noAchievements>
+                <p class="text-center">No hay logros configurados.</p>
+              </ng-template>
               <div class="d-grid gap-2 d-md-flex justify-content-md-end  pt-1">
                 <button type="button" class="btn btn-info" (click)="setAchievement()"
                         data-bs-toggle="modal" data-bs-target="#achieveModal">Nueva
@@ -91,23 +94,32 @@
                   <h6>Imagen:</h6>
                 </div>
               </div>
-              <div class="row align-items-center" *ngIf=" project.image &&  project.icon else noImage">
+              <div class="row align-items-center">
                 <div class="col-md-6 col-xs-12 align-self-center">
-                  <img *ngIf="project.image" src="{{project.image}}" alt="{{project.name}}" class="mainImage shadow">
+                  <img *ngIf="project.image else noImage" src="{{project.image}}" alt="{{project.name}}"
+                       class="mainImage shadow">
+                  <div class="d-grid gap-2 d-md-flex justify-content-md-end  pt-1" *ngIf="logged">
+                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#imageModal"
+                            (click)="setImageCategory('general')">Nueva
+                    </button>
+                  </div>
+                  <ng-template #noImage>
+                    <p class="text-center">No hay imagen configurada</p>
+                  </ng-template>
                 </div>
                 <div class="col-md-6 col-xs-12 align-self-center">
-                  <img *ngIf="project.icon" src="{{project.icon}}" alt="Icono {{project.name}}"
+                  <img *ngIf="project.icon else noIcon" src="{{project.icon}}" alt="Icono {{project.name}}"
                        class="iconImage  shadow ml-2">
+                  <div class="d-grid gap-2 d-md-flex justify-content-md-end  pt-1" *ngIf="logged">
+                    <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#imageModal"
+                            (click)="setImageCategory('icon')">Nueva
+                    </button>
+                  </div>
+                  <ng-template #noIcon>
+                    <p class="text-center">No hay icono configurado</p>
+                  </ng-template>
                 </div>
               </div>
-              <ng-template #noImage>
-                <p class="text-center">No hay imagen configurada</p>
-              </ng-template>
-            </div>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end  pt-1" *ngIf="logged">
-              <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#imageModal"
-                      (click)="setImageCategory('general')">Nueva
-              </button>
             </div>
             <div class="form-group">
               <h6>Referencias:</h6>
@@ -115,9 +127,7 @@
                 <div class="col-md-2 col-xs-12  align-self-center"
                      *ngFor="let reference of project.references; index as i">
                   <div class="fs-2">
-                    <a href=" {{reference.url}}">
-                      <i class="{{reference.icon}}"></i>
-                    </a>
+                    <i class="{{reference.icon}}"></i>
                   </div>
                   <span class="badge bg-danger rounded-pill" (click)="removeReference(i)">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -318,12 +328,13 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-        <button *ngIf="imageCategory !== 'captures'" type="button" class="btn btn-primary" data-bs-dismiss="modal"
+        <button *ngIf="imageCategory === 'general' || imageCategory === 'icon'" type="button" class="btn btn-primary"
+                data-bs-dismiss="modal"
                 [disabled]="upload"
                 (click)="updateData()">Agregar
         </button>
         <button *ngIf="imageCategory === 'captures'" type="button" class="btn btn-primary" data-bs-dismiss="modal"
-                [disabled]="upload || (imageCategory === 'captures' && !auxCapture.title)"
+                [disabled]="upload"
                 (click)="addCapture()">Agregar
         </button>
       </div>
