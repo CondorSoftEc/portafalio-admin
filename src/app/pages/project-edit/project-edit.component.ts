@@ -45,7 +45,7 @@ export class ProjectEditComponent implements OnInit, OnDestroy {
   auxReference;
   auxCapture;
 
-  logged = true;
+  logged = false;
 
   categories = Categories;
   icons = Icons;
